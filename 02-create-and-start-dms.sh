@@ -8,8 +8,9 @@ DEST_INSTANCE="postgres33-uxoli"
 SOURCE_PROFILE="postgres-vm-source"
 DEST_PROFILE="postgres33-destination"
 JOB_ID="gsp355-orders-migration"
-ZONE="$(gcloud compute instances list --filter='name=postgres-vm' --format='value(zone)' | head -n1)"
-SOURCE_IP="$(gcloud compute instances describe postgres-vm --zone="${ZONE}" --format='value(networkInterfaces[0].networkIP)')"
+VM_NAME="$(gcloud compute instances list --filter='name~^postgres.*-vm$' --format='value(name)' | head -n1)"
+ZONE="$(gcloud compute instances describe "${VM_NAME}" --format='value(zone.basename())')"
+SOURCE_IP="$(gcloud compute instances describe "${VM_NAME}" --zone="${ZONE}" --format='value(networkInterfaces[0].networkIP)')"
 VPC="projects/${PROJECT_ID}/global/networks/default"
 
 [[ -n "${PROJECT_ID}" && "${PROJECT_ID}" != "(unset)" ]] || { echo "ERROR: Set the lab project first." >&2; exit 1; }

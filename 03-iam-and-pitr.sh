@@ -5,8 +5,9 @@ set -euo pipefail
 PROJECT_ID="$(gcloud config get-value project 2>/dev/null)"
 INSTANCE="postgres33-uxoli"
 IAM_USER="$(gcloud config get-value account 2>/dev/null)"
-VM_ZONE="$(gcloud compute instances list --filter='name=postgres-vm' --format='value(zone)' | head -n1)"
-VM_IP="$(gcloud compute instances describe postgres-vm --zone="${VM_ZONE}" --format='value(networkInterfaces[0].accessConfigs[0].natIP)')"
+VM_NAME="$(gcloud compute instances list --filter='name~^postgres.*-vm$' --format='value(name)' | head -n1)"
+VM_ZONE="$(gcloud compute instances describe "${VM_NAME}" --format='value(zone.basename())')"
+VM_IP="$(gcloud compute instances describe "${VM_NAME}" --zone="${VM_ZONE}" --format='value(networkInterfaces[0].accessConfigs[0].natIP)')"
 
 [[ -n "${PROJECT_ID}" && "${PROJECT_ID}" != "(unset)" ]] || { echo "ERROR: Set the lab project first." >&2; exit 1; }
 
